@@ -1,0 +1,56 @@
+import { Component, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@Component({
+    selector: 'app-cards',
+    standalone: true,
+    imports: [CommonModule],
+    template: `
+    <div class="min-h-screen w-full flex flex-col items-center justify-center bg-stone-100 p-4 md:p-12 relative">
+      <div class="grid md:grid-cols-2 gap-8 max-w-5xl w-full perspective-1000">
+        
+        <!-- Grateful Card -->
+        <div class="group h-[500px] w-full relative preserve-3d cursor-pointer">
+          <div class="absolute inset-0 bg-white rounded-xl shadow-2xl p-8 flex flex-col items-center justify-center text-center border-2 border-stone-200 transition-transform duration-500 ease-in-out group-hover:-translate-y-4">
+            <div class="text-6xl mb-6">🙏</div>
+            <h3 class="text-3xl font-serif text-stone-800 mb-4">Grateful For You</h3>
+            <p class="text-stone-600 leading-relaxed">
+              Before I met you, I didn't know what it felt like to look at someone and smile for no reason. 
+              I am grateful for your patience, your kindness, and the way you make me a better person.
+            </p>
+          </div>
+        </div>
+
+        <!-- Apology Card -->
+        <div class="group h-[500px] w-full relative preserve-3d cursor-pointer mt-8 md:mt-0">
+          <div class="absolute inset-0 bg-white rounded-xl shadow-2xl p-8 flex flex-col items-center justify-center text-center border-2 border-stone-200 transition-transform duration-500 ease-in-out group-hover:-translate-y-4">
+             <div class="text-6xl mb-6">🥺</div>
+             <h3 class="text-3xl font-serif text-stone-800 mb-4">I'm Sorry</h3>
+             <p class="text-stone-600 leading-relaxed">
+              I know I haven't been the best partner lately. I've made mistakes, and I've let you down. 
+              I am truly sorry for [specific things if you edit code], and I promise to work on myself.
+             </p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-12 animate-bounce">
+         <button (click)="next.emit()" class="px-8 py-3 bg-stone-800 text-white font-serif rounded-full shadow-lg hover:bg-stone-700 transition-all duration-300">
+           One Last Surprise <span>✨</span>
+         </button>
+      </div>
+    </div>
+  `,
+    styles: [`
+    .preserve-3d {
+      transform-style: preserve-3d;
+    }
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+  `]
+})
+export class CardsComponent {
+    @Output() next = new EventEmitter<void>();
+}
