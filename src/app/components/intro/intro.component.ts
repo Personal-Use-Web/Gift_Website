@@ -1,5 +1,6 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import confetti from 'canvas-confetti';
 
 @Component({
   selector: 'app-intro',
@@ -17,6 +18,38 @@ export class IntroComponent {
   claimGift() {
     this.isClaimed = true;
 
+    // Trigger Confetti
+    const colors = ['#ffccd5', '#ffb7b2', '#ff9aa2', '#e2f0cb', '#b5ead7'];
+
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: colors,
+      zIndex: 100
+    });
+
+    // Fire a second burst for good measure
+    setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: colors,
+        zIndex: 100
+      });
+      confetti({
+        particleCount: 50,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: colors,
+        zIndex: 100
+      });
+    }, 250);
+
+
     // Trigger animation
     setTimeout(() => {
       this.animateOut = true;
@@ -26,6 +59,6 @@ export class IntroComponent {
     setTimeout(() => {
       this.animationDone = true;
       this.next.emit();
-    }, 2400); // Matches new animation duration (slightly less to prevent flash)
+    }, 2400);
   }
 }
