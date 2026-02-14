@@ -1,0 +1,35 @@
+/* Optimized animations */
+.animate-scroll-up {
+    animation: scrollUp 40s linear infinite;
+    will-change: transform;
+}
+
+.animate-scroll-down {
+    animation: scrollDown 50s linear infinite;
+    will-change: transform;
+}
+
+.animate-scroll-up-slow {
+    animation: scrollUp 60s linear infinite;
+    will-change: transform;
+}
+
+@keyframes scrollUp {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-50%);
+    }
+}
+
+@keyframes scrollDown {
+    0% {
+        transform: translateY(-50%);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}

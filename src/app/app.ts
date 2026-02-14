@@ -21,28 +21,8 @@ type Section = 'intro' | 'carousel' | 'memory' | 'cards' | 'globe';
     CardsComponent,
     GlobeComponent
   ],
-  template: `
-    <main class="w-full h-screen overflow-hidden font-sans text-slate-800 bg-white">
-      <!-- Persistent Time Counter (Visible after intro) -->
-      <app-time-counter *ngIf="currentSection !== 'intro'"></app-time-counter>
-
-      <!-- Sections -->
-      <ng-container [ngSwitch]="currentSection">
-        
-        <app-intro *ngSwitchCase="'intro'" (next)="goTo('carousel')"></app-intro>
-        
-        <app-carousel *ngSwitchCase="'carousel'" (next)="goTo('memory')"></app-carousel>
-        
-        <app-memory-lane *ngSwitchCase="'memory'" (next)="goTo('cards')"></app-memory-lane>
-
-        <app-cards *ngSwitchCase="'cards'" (next)="goTo('globe')"></app-cards>
-
-        <app-globe *ngSwitchCase="'globe'" (restart)="restart()"></app-globe>
-
-      </ng-container>
-    </main>
-  `,
-  styles: []
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
 })
 export class App {
   currentSection: Section = 'intro';

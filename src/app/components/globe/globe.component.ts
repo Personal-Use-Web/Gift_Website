@@ -7,29 +7,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
     selector: 'app-globe',
     standalone: true,
     imports: [CommonModule],
-    template: `
-    <div class="relative w-full h-screen bg-black overflow-hidden">
-      <!-- 3D Canvas -->
-      <canvas #canvas class="w-full h-full block"></canvas>
-
-      <!-- Overlay UI -->
-      <div class="absolute top-8 left-0 w-full text-center pointer-events-none z-10">
-        <h2 class="text-white/80 font-serif text-3xl tracking-widest uppercase">Our World</h2>
-        <p class="text-white/50 text-sm mt-2">Zoom inside to see the memories</p>
-      </div>
-      
-      <!-- Footer/Restart -->
-      <div class="absolute bottom-8 w-full text-center z-10 pointer-events-auto">
-        <div class="mb-4">
-           <h3 class="text-2xl text-pink-300 font-serif italic">Thank You for being my partner</h3>
-        </div>
-        <button (click)="restart.emit()" class="px-6 py-2 border border-white/30 text-white hover:bg-white/10 rounded-full transition-colors uppercase text-sm tracking-widest">
-          Restart Journey
-        </button>
-      </div>
-    </div>
-  `,
-    styles: []
+    templateUrl: './globe.component.html',
+    styleUrls: ['./globe.component.css']
 })
 export class GlobeComponent implements AfterViewInit, OnDestroy {
     @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;

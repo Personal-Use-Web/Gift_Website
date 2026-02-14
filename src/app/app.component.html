@@ -1,0 +1,25 @@
+<main class="w-full h-screen overflow-hidden font-sans text-slate-800 bg-white">
+    <!-- Persistent Time Counter (Visible after intro) -->
+    @if (currentSection !== 'intro') {
+    <app-time-counter></app-time-counter>
+    }
+
+    <!-- Sections -->
+    @switch (currentSection) {
+    @case ('intro') {
+    <app-intro (next)="goTo('carousel')"></app-intro>
+    }
+    @case ('carousel') {
+    <app-carousel (next)="goTo('memory')"></app-carousel>
+    }
+    @case ('memory') {
+    <app-memory-lane (next)="goTo('cards')"></app-memory-lane>
+    }
+    @case ('cards') {
+    <app-cards (next)="goTo('globe')"></app-cards>
+    }
+    @case ('globe') {
+    <app-globe (restart)="restart()"></app-globe>
+    }
+    }
+</main>
