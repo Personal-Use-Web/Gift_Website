@@ -8,19 +8,16 @@
         <div class="flex flex-col gap-4 animate-scroll-up">
             @for (img of col1; track img) {
             <div
-                class="w-full aspect-[3/4] bg-gray-200 rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
-                <!-- Placeholder images using colors or text -->
-                <div
-                    class="w-full h-full flex items-center justify-center text-4xl bg-rose-100 text-rose-300 font-bold">
-                    Photo {{img}}</div>
+                class="w-full bg-gray-200 rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
+                <img [src]="'/memory-lane/' + img" class="w-full h-auto object-contain block"
+                    alt="Memory {{img}}">
             </div>
             }
             <!-- Duplicate for infinite scroll illusion -->
             @for (img of col1; track img) {
-            <div class="w-full aspect-[3/4] bg-gray-200 rounded-lg overflow-hidden shadow-md">
-                <div
-                    class="w-full h-full flex items-center justify-center text-4xl bg-rose-100 text-rose-300 font-bold">
-                    Photo {{img}}</div>
+            <div class="w-full bg-gray-200 rounded-lg overflow-hidden shadow-md">
+                <img [src]="'/memory-lane/' + img" class="w-full h-auto object-contain block"
+                    alt="Memory {{img}}">
             </div>
             }
         </div>
@@ -29,18 +26,16 @@
         <div class="flex flex-col gap-4 animate-scroll-down">
             @for (img of col2; track img) {
             <div
-                class="w-full aspect-[4/5] bg-gray-200 rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
-                <div
-                    class="w-full h-full flex items-center justify-center text-4xl bg-teal-100 text-teal-300 font-bold">
-                    Moment {{img}}</div>
+                class="w-full bg-gray-200 rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
+                <img [src]="'/memory-lane/' + img" class="w-full h-auto object-contain block"
+                    alt="Moment {{img}}">
             </div>
             }
             <!-- Duplicate -->
             @for (img of col2; track img) {
-            <div class="w-full aspect-[4/5] bg-gray-200 rounded-lg overflow-hidden shadow-md">
-                <div
-                    class="w-full h-full flex items-center justify-center text-4xl bg-teal-100 text-teal-300 font-bold">
-                    Moment {{img}}</div>
+            <div class="w-full bg-gray-200 rounded-lg overflow-hidden shadow-md">
+                <img [src]="'/memory-lane/' + img" class="w-full h-auto object-contain block"
+                    alt="Moment {{img}}">
             </div>
             }
         </div>
@@ -49,18 +44,16 @@
         <div class="flex flex-col gap-4 animate-scroll-up-slow">
             @for (img of col3; track img) {
             <div
-                class="w-full aspect-[3/4] bg-gray-200 rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
-                <div
-                    class="w-full h-full flex items-center justify-center text-4xl bg-indigo-100 text-indigo-300 font-bold">
-                    Snap {{img}}</div>
+                class="w-full bg-gray-200 rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
+                <img [src]="'/memory-lane/' + img" class="w-full h-auto object-contain block"
+                    alt="Snap {{img}}">
             </div>
             }
             <!-- Duplicate -->
             @for (img of col3; track img) {
-            <div class="w-full aspect-[3/4] bg-gray-200 rounded-lg overflow-hidden shadow-md">
-                <div
-                    class="w-full h-full flex items-center justify-center text-4xl bg-indigo-100 text-indigo-300 font-bold">
-                    Snap {{img}}</div>
+            <div class="w-full bg-gray-200 rounded-lg overflow-hidden shadow-md">
+                <img [src]="'/memory-lane/' + img" class="w-full h-auto object-contain block"
+                    alt="Snap {{img}}">
             </div>
             }
         </div>

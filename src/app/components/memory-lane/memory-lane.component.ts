@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 export class MemoryLaneComponent {
   @Output() next = new EventEmitter<void>();
 
-  col1 = [1, 2, 3, 4, 5];
-  col2 = [6, 7, 8, 9, 10];
-  col3 = [11, 12, 13, 14, 15];
+  col1 = ["photo_6091182620340325648_y.jpg", "photo_6158738027791370560_y.jpg", "photo_6091182620340325659_x.jpg", "photo_6091182620340325653_y.jpg", "photo_6158738027791370671_y.jpg"];
+  col2 = ["photo_6091182620340325645_y.jpg", "photo_6091182620340325663_y.jpg", "photo_6091182620340325658_y.jpg", "photo_6091182620340325657_y.jpg", "photo_6091182620340325656_y.jpg", "photo_6091182620340325664_y.jpg"];
+  col3 = ["photo_6091182620340325661_y.jpg", "photo_6091182620340325662_x.jpg", "photo_6091182620340325646_y.jpg", "photo_6091182620340325644_y.jpg", "photo_6091182620340325655_y.jpg"];
 }
