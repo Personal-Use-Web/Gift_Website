@@ -22,6 +22,10 @@ export class GlobeComponent implements AfterViewInit, OnDestroy {
     private stars!: THREE.Points;
     private meshes: THREE.Object3D[] = [];
 
+    private textureCache = new Map<string, THREE.Texture>();
+    private videoCache = new Map<string, { element: HTMLVideoElement, texture: THREE.VideoTexture }>();
+    private loadPromises = new Map<string, Promise<THREE.Texture>>();
+
     // Media assets
     private images = [
         "IMG-20251005-WA0049.jpg", "IMG-20251026-WA0004.jpg", "IMG-20251214-WA0011.jpg",
@@ -48,6 +52,7 @@ export class GlobeComponent implements AfterViewInit, OnDestroy {
 
     ngAfterViewInit(): void {
         this.initThree();
+        this.createCore();
         this.createGlobe();
         this.createStars();
         this.animate();
@@ -59,19 +64,30 @@ export class GlobeComponent implements AfterViewInit, OnDestroy {
         if (this.animationId) cancelAnimationFrame(this.animationId);
         window.removeEventListener('resize', this.onResize.bind(this));
 
-        // Cleanup
-        this.meshes.forEach(mesh => {
-            if (mesh.geometry) mesh.geometry.dispose();
-            if (mesh.material instanceof THREE.Material) mesh.material.dispose();
+        // Cleanup Meshes & Textures
+        this.meshes.forEach(obj => {
+            if (obj instanceof THREE.Group) {
+                obj.traverse((child) => {
+                    if (child instanceof THREE.Mesh) {
+                        if (child.geometry) child.geometry.dispose();
+                        if (child.material instanceof THREE.Material) child.material.dispose();
+                    }
+                });
+            }
         });
 
         if (this.renderer) this.renderer.dispose();
 
-        this.videoElements.forEach(v => {
-            v.pause();
-            v.remove();
+        // Cleanup Videos
+        this.videoCache.forEach(({ element, texture }) => {
+            element.pause();
+            element.remove();
+            texture.dispose();
         });
-        this.videoElements = [];
+        this.videoCache.clear();
+
+        this.textureCache.forEach(texture => texture.dispose());
+        this.textureCache.clear();
     }
 
     private initThree() {
@@ -91,8 +107,8 @@ export class GlobeComponent implements AfterViewInit, OnDestroy {
         this.controls.dampingFactor = 0.05;
         this.controls.enableZoom = true;
         this.controls.autoRotate = true;
-        this.controls.autoRotateSpeed = 0.8;
-        this.controls.minDistance = 5;
+        this.controls.autoRotateSpeed = 0.5;
+        this.controls.minDistance = 15;
         this.controls.maxDistance = 100;
 
         const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
@@ -103,10 +119,22 @@ export class GlobeComponent implements AfterViewInit, OnDestroy {
         this.scene.add(pointLight);
     }
 
-    private createGlobe() {
+    private createCore() {
+        // Create a central wireframe sphere to visually connect the items
+        const geometry = new THREE.SphereGeometry(11.8, 32, 32);
+        const material = new THREE.MeshBasicMaterial({
+            color: 0x444444,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.15
+        });
+        const sphere = new THREE.Mesh(geometry, material);
+        this.scene.add(sphere);
+    }
+
+    private async createGlobe() {
         const count = 50;
         const globeRadius = 12;
-        const loader = new THREE.TextureLoader();
 
         for (let i = 0; i < count; i++) {
             // Spherical distribution via Fibonacci sphere algorithm
@@ -122,39 +150,72 @@ export class GlobeComponent implements AfterViewInit, OnDestroy {
             const mediaSrc = this.totalMedia[mediaIndex];
             const isVideo = mediaSrc.endsWith('.mp4');
 
-            if (isVideo) {
-                const videoEl = document.createElement('video');
-                videoEl.src = mediaSrc;
-                videoEl.loop = true;
-                videoEl.muted = true;
-                videoEl.playsInline = true;
-                videoEl.crossOrigin = "anonymous";
-                videoEl.play().catch(e => console.warn("Video play failed", e));
+            try {
+                const texture = await this.getTexture(mediaSrc, isVideo);
+                texture.colorSpace = THREE.SRGBColorSpace;
 
-                this.videoElements.push(videoEl);
+                // Determine Aspect Ratio
+                let aspect = 1;
+                const image: any = texture.image;
+                if (isVideo) {
+                    const vid = image as HTMLVideoElement;
+                    if (vid.videoWidth) {
+                        aspect = vid.videoWidth / vid.videoHeight;
+                    } else {
+                        aspect = 16 / 9;
+                    }
+                } else {
+                    aspect = image.width / image.height;
+                }
 
-                const videoTexture = new THREE.VideoTexture(videoEl);
-                videoTexture.minFilter = THREE.LinearFilter;
-                videoTexture.magFilter = THREE.LinearFilter;
-                videoTexture.colorSpace = THREE.SRGBColorSpace;
+                this.createMeshGroup(x, y, z, texture, aspect);
 
-                this.createMesh(x, y, z, videoTexture, 16 / 9);
-            } else {
-                loader.load(mediaSrc, (texture) => {
-                    texture.colorSpace = THREE.SRGBColorSpace;
-                    const aspect = texture.image.width / texture.image.height;
-                    this.createMesh(x, y, z, texture, aspect);
-                }, undefined, (err) => {
-                    console.error("Error loading texture:", mediaSrc, err);
-                });
+            } catch (err) {
+                console.error("Failed to load texture for globe item:", mediaSrc, err);
             }
         }
     }
 
-    private createMesh(x: number, y: number, z: number, texture: THREE.Texture, aspect: number) {
-        // Base size logic: constrain max dimension to ~3 units
+    private getTexture(url: string, isVideo: boolean): Promise<THREE.Texture> {
+        if (isVideo) {
+            if (this.videoCache.has(url)) {
+                return Promise.resolve(this.videoCache.get(url)!.texture);
+            }
+
+            return new Promise((resolve) => {
+                const video = document.createElement('video');
+                video.src = url;
+                video.loop = true;
+                video.muted = true;
+                video.playsInline = true;
+                video.crossOrigin = "anonymous";
+                video.play().catch(e => console.warn("Video play failed", e));
+
+                const texture = new THREE.VideoTexture(video);
+                texture.minFilter = THREE.LinearFilter;
+                texture.magFilter = THREE.LinearFilter;
+
+                this.videoCache.set(url, { element: video, texture });
+                resolve(texture);
+            });
+        } else {
+            if (this.textureCache.has(url)) {
+                return Promise.resolve(this.textureCache.get(url)!);
+            }
+
+            return new Promise((resolve, reject) => {
+                new THREE.TextureLoader().load(url, (texture) => {
+                    this.textureCache.set(url, texture);
+                    resolve(texture);
+                }, undefined, reject);
+            });
+        }
+    }
+
+    private createMeshGroup(x: number, y: number, z: number, texture: THREE.Texture, aspect: number) {
+        // Base size logic
         let width, height;
-        const scaleFactor = 3.5;
+        const scaleFactor = 4;
 
         if (aspect > 1) {
             width = scaleFactor;
@@ -164,28 +225,33 @@ export class GlobeComponent implements AfterViewInit, OnDestroy {
             width = scaleFactor * aspect;
         }
 
+        const group = new THREE.Group();
+        group.position.set(x, y, z);
+        group.lookAt(0, 0, 0);
+
+        // 1. Image Plane
         const geometry = new THREE.PlaneGeometry(width, height);
         const material = new THREE.MeshBasicMaterial({
             map: texture,
             side: THREE.DoubleSide,
             transparent: true
         });
-
         const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(x, y, z);
-        mesh.lookAt(0, 0, 0); // Face center
+        mesh.position.set(0, 0, 0);
 
-        // Flip to face outward correctly since we are "outside" looking in? 
-        // Actually lookAt(0,0,0) makes back face outwards. 
-        // We want front face outward.
-        mesh.lookAt(new THREE.Vector3(0, 0, 0));
-        // Fix orientation: rotate 180 on Y to face outward if needed, or just use DoubleSide (handled).
+        // 2. Border Plane
+        const borderGeo = new THREE.PlaneGeometry(width + 0.2, height + 0.2);
+        const borderMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+        const borderMesh = new THREE.Mesh(borderGeo, borderMat);
+        borderMesh.position.set(0, 0, 0.05);
 
-        // Add local random tilt
-        mesh.rotateZ((Math.random() - 0.5) * 0.5);
+        group.add(borderMesh);
+        group.add(mesh);
 
-        this.scene.add(mesh);
-        this.meshes.push(mesh);
+        group.rotateZ((Math.random() - 0.5) * 0.2);
+
+        this.scene.add(group);
+        this.meshes.push(group);
     }
 
     private createStars() {
