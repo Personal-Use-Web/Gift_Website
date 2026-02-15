@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, AfterViewInit, OnDestroy, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -14,6 +14,8 @@ export class GlobeComponent implements AfterViewInit, OnDestroy {
     @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
     @Output() restart = new EventEmitter<void>();
 
+    constructor(private cdr: ChangeDetectorRef) { }
+
     private scene!: THREE.Scene;
     private camera!: THREE.PerspectiveCamera;
     private renderer!: THREE.WebGLRenderer;
@@ -22,6 +24,7 @@ export class GlobeComponent implements AfterViewInit, OnDestroy {
     private stars!: THREE.Points;
     private meshes: THREE.Mesh[] = [];
     private videoElements: HTMLVideoElement[] = [];
+    isLoading = true;
 
     // Media assets
     private images = [
@@ -107,10 +110,39 @@ export class GlobeComponent implements AfterViewInit, OnDestroy {
     private createGlobe() {
         const count = 50;
         const globeRadius = 12;
-        const loader = new THREE.TextureLoader();
+
+        const loadingManager = new THREE.LoadingManager();
+        const loader = new THREE.TextureLoader(loadingManager);
+        const videoPromises: Promise<void>[] = [];
+
+        const checkFinished = () => {
+            Promise.all(videoPromises).then(() => {
+                this.isLoading = false;
+                this.cdr.detectChanges();
+            }).catch(() => {
+                this.isLoading = false;
+                this.cdr.detectChanges();
+            });
+        };
+
+        loadingManager.onLoad = () => {
+            checkFinished();
+        };
+
+        loadingManager.onError = (url) => {
+            console.error('There was an error loading ' + url);
+            checkFinished();
+        };
+
+        // Safety timeout: remove loader after 12 seconds no matter what
+        setTimeout(() => {
+            if (this.isLoading) {
+                this.isLoading = false;
+                this.cdr.detectChanges();
+            }
+        }, 12000);
 
         for (let i = 0; i < count; i++) {
-            // Spherical distribution via Fibonacci sphere algorithm
             const phi = Math.acos(1 - 2 * (i + 0.5) / count);
             const theta = Math.PI * (1 + 5 ** 0.5) * (i + 0.5);
 
@@ -118,7 +150,6 @@ export class GlobeComponent implements AfterViewInit, OnDestroy {
             const y = globeRadius * Math.sin(theta) * Math.sin(phi);
             const z = globeRadius * Math.cos(phi);
 
-            // Pick media cyclically
             const mediaIndex = i % this.totalMedia.length;
             const mediaSrc = this.totalMedia[mediaIndex];
             const isVideo = mediaSrc.endsWith('.mp4');
@@ -130,13 +161,21 @@ export class GlobeComponent implements AfterViewInit, OnDestroy {
                 videoEl.muted = true;
                 videoEl.playsInline = true;
                 videoEl.crossOrigin = "anonymous";
-                videoEl.play().catch(e => console.warn("Video play failed", e));
+
+                const videoReady = new Promise<void>((resolve) => {
+                    videoEl.oncanplaythrough = () => resolve();
+                    videoEl.onerror = () => resolve(); // Skip erroring videos
+                    setTimeout(resolve, 6000); // 6s per video timeout
+                });
+                videoPromises.push(videoReady);
+
+                videoEl.play().catch(e => {
+                    console.warn("Video play failed", e);
+                });
 
                 this.videoElements.push(videoEl);
 
                 const videoTexture = new THREE.VideoTexture(videoEl);
-                videoTexture.minFilter = THREE.LinearFilter;
-                videoTexture.magFilter = THREE.LinearFilter;
                 videoTexture.colorSpace = THREE.SRGBColorSpace;
 
                 this.createMesh(x, y, z, videoTexture, 16 / 9);
@@ -149,6 +188,10 @@ export class GlobeComponent implements AfterViewInit, OnDestroy {
                     console.error("Error loading texture:", mediaSrc, err);
                 });
             }
+        }
+
+        if (this.images.length === 0) {
+            checkFinished();
         }
     }
 

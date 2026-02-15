@@ -18,4 +18,25 @@
             Restart Journey
         </button>
     </div>
+
+    <!-- Loader Overlay -->
+    <div *ngIf="isLoading"
+        class="fixed inset-0 z-100 flex flex-col items-center justify-center bg-black/60 backdrop-blur-2xl transition-opacity duration-1000"
+        [class.opacity-0]="!isLoading">
+        <div class="relative flex items-center justify-center scale-150">
+            <!-- Infinite Loader -->
+            <div class="heart-infinity">
+                <div class="infinity">
+                    <svg viewBox="0 0 100 50" class="w-24 h-12 stroke-pink-400 fill-none stroke-3 stroke-round">
+                        <path
+                            d="M25 25 C25 10, 45 10, 50 25 C55 40, 75 40, 75 25 C75 10, 55 10, 50 25 C45 40, 25 40, 25 25"
+                            class="infinity-path" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <p class="mt-16 text-pink-200 font-serif text-xl tracking-widest animate-pulse px-4 text-center">
+            Please wait my love this need some time
+        </p>
+    </div>
 </div>

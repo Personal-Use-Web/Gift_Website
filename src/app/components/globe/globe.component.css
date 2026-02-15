@@ -1,1 +1,23 @@
-/* Globe specific styles if needed */
+/* Loader Styles */
+.heart-infinity {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.infinity-path {
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    animation: infinityDraw 3s linear infinite;
+}
+
+@keyframes infinityDraw {
+    0% {
+        stroke-dashoffset: 300;
+    }
+
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
