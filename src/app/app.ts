@@ -21,8 +21,8 @@ type Section = 'intro' | 'carousel' | 'memory' | 'cards' | 'globe';
     CardsComponent,
     GlobeComponent
   ],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  templateUrl: './app.html',
+  styleUrls: ['./app.css']
 })
 export class App {
   currentSection: Section = 'intro';
