@@ -12,11 +12,11 @@ export class CarouselComponent implements OnInit, OnDestroy {
   @Output() next = new EventEmitter<void>();
 
   notes = [
-    { title: "My Dearest", content: "Every moment with you feels like a beautiful dream I never want to wake up from." },
-    { title: "The Little Things", content: "I love the way your eyes light up when you smile, and how you make even the mundane days feel special." },
-    { title: "Better Together", content: "We've had our ups and downs, but every challenge only makes us stronger. I choose you, every single day." },
-    { title: "My Promise", content: "I promise to be better, to listen more, and to love you even when things are tough." },
-    { title: "Forever", content: "You are my best friend, my soulmate, and my greatest adventure." }
+    { title: "My Dear", content: "I Enjoy every moment with you, it feels like a beautiful dream I never want to wake up from." },
+    { title: "The Little Things", content: "I love the way your eyes light up when you smile, and how you make me feel special." },
+    { title: "Better Together", content: "We've had our ups and downs, but every fights only makes us stronger." },
+    { title: "My Promise", content: "I promise to be better, to understand more, and to love you even when things are tough." },
+    { title: "Forever I Love You", content: "You are my best friend, my soulmate, and my greatest strength." }
   ];
 
   currentIndex = 0;
