@@ -50,10 +50,8 @@ export class IntroComponent {
     }, 250);
 
 
-    // Trigger animation
-    setTimeout(() => {
-      this.animateOut = true;
-    }, 50);
+    
+    this.animateOut = true;
 
     // Transition
     setTimeout(() => {

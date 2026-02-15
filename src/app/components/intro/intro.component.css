@@ -44,7 +44,7 @@
 }
 
 .animate-zoom-in {
-    animation: zoomIn 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: zoomIn 5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     will-change: transform, opacity;
 }
 
@@ -56,7 +56,6 @@
 
     100% {
         transform: translateZ(1500px) scale(4);
-        /* Moves physically closer in 3D space */
         opacity: 0;
     }
 }

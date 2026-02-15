@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./time-counter.component.css']
 })
 export class TimeCounterComponent implements OnInit, OnDestroy {
-  @Input() startDate: Date = new Date('2023-01-01'); // Default fallback
+  @Input() startDate: Date = new Date('2025-03-29');
   timeString: string = '';
   private intervalId: any;
 
